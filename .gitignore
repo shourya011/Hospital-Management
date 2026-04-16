@@ -1,0 +1,67 @@
+# ============================================
+# CRITICAL: Database & Credentials
+# ============================================
+*.properties
+config.xml
+connection.xml
+db.conf
+db/
+
+# ============================================
+# CRITICAL: Documentation with secrets
+# ============================================
+QUICKSTART.md
+SETUP.md
+AdvancedJava_Report.md
+README.md
+
+# ============================================
+# Java Compilation & Build
+# ============================================
+*.class
+*.jar
+*.war
+bin/
+out/
+target/
+dist/
+
+# ============================================
+# IDE & Editor Files
+# ============================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Build Tools
+# ============================================
+.m2/
+pom.xml.tag
+pom.xml.releaseBackup
+.gradle/
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+# ============================================
+# OS & Temporary Files
+# ============================================
+thumbs.db
+.AppleDouble
+.LSOverride
+*.tmp
+*.bak
+*.log
+
+# Database backups (optional - uncomment if needed)
+# *.sql.bak
+# *.sql.backup
