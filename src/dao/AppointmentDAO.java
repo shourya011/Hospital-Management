@@ -59,7 +59,7 @@ public class AppointmentDAO {
      */
     public ArrayList<Appointment> getAllAppointments() {
         ArrayList<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT a.*, p.first_name, p.last_name, d.name, d.specialization " +
+        String sql = "SELECT a.*, p.first_name, p.last_name, d.doctor_name, d.specialization " +
                      "FROM appointments a " +
                      "JOIN patients p ON a.patient_id = p.patient_id " +
                      "JOIN doctors d ON a.doctor_id = d.doctor_id " +
@@ -81,7 +81,7 @@ public class AppointmentDAO {
                     rs.getTimestamp("created_at").toString()
                 );
                 apt.setPatientName(rs.getString("first_name") + " " + rs.getString("last_name"));
-                apt.setDoctorName(rs.getString("name"));
+                apt.setDoctorName(rs.getString("doctor_name"));
                 apt.setSpecialization(rs.getString("specialization"));
                 appointments.add(apt);
             }
@@ -100,7 +100,7 @@ public class AppointmentDAO {
      */
     public ArrayList<Appointment> getAppointmentsByPatient(int patientId) {
         ArrayList<Appointment> appointments = new ArrayList<>();
-        String sql = "SELECT a.*, p.first_name, p.last_name, d.name, d.specialization " +
+        String sql = "SELECT a.*, p.first_name, p.last_name, d.doctor_name, d.specialization " +
                      "FROM appointments a " +
                      "JOIN patients p ON a.patient_id = p.patient_id " +
                      "JOIN doctors d ON a.doctor_id = d.doctor_id " +
@@ -124,7 +124,7 @@ public class AppointmentDAO {
                         rs.getTimestamp("created_at").toString()
                     );
                     apt.setPatientName(rs.getString("first_name") + " " + rs.getString("last_name"));
-                    apt.setDoctorName(rs.getString("name"));
+                    apt.setDoctorName(rs.getString("doctor_name"));
                     apt.setSpecialization(rs.getString("specialization"));
                     appointments.add(apt);
                 }
@@ -165,7 +165,7 @@ public class AppointmentDAO {
      * @return Appointment object if found, null otherwise
      */
     public Appointment getAppointmentById(int appointmentId) {
-        String sql = "SELECT a.*, p.first_name, p.last_name, d.name, d.specialization " +
+        String sql = "SELECT a.*, p.first_name, p.last_name, d.doctor_name, d.specialization " +
                      "FROM appointments a " +
                      "JOIN patients p ON a.patient_id = p.patient_id " +
                      "JOIN doctors d ON a.doctor_id = d.doctor_id " +
@@ -188,7 +188,7 @@ public class AppointmentDAO {
                         rs.getTimestamp("created_at").toString()
                     );
                     apt.setPatientName(rs.getString("first_name") + " " + rs.getString("last_name"));
-                    apt.setDoctorName(rs.getString("name"));
+                    apt.setDoctorName(rs.getString("doctor_name"));
                     apt.setSpecialization(rs.getString("specialization"));
                     return apt;
                 }
@@ -207,14 +207,14 @@ public class AppointmentDAO {
      */
     public ArrayList<String> getAllDoctors() {
         ArrayList<String> doctors = new ArrayList<>();
-        String sql = "SELECT doctor_id, name, specialization FROM doctors ORDER BY specialization, name";
+        String sql = "SELECT doctor_id, doctor_name, specialization FROM doctors ORDER BY specialization, doctor_name";
         
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
                 String doctorInfo = rs.getInt("doctor_id") + ":::" +
-                                   rs.getString("name") + " - " +
+                                   rs.getString("doctor_name") + " - " +
                                    rs.getString("specialization");
                 doctors.add(doctorInfo);
             }

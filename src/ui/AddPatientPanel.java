@@ -20,6 +20,7 @@ import java.util.ArrayList;
  */
 public class AddPatientPanel extends JPanel {
     private PatientDAO patientDAO;
+    private DataChangeManager dataChangeManager;
     private PatientQueue patientQueue;
     private PatientLinkedList patientLinkedList;
     
@@ -54,6 +55,7 @@ public class AddPatientPanel extends JPanel {
      */
     public AddPatientPanel(PatientDAO patientDAO) {
         this.patientDAO = patientDAO;
+        this.dataChangeManager = DataChangeManager.getInstance();
         this.patientQueue = new PatientQueue();
         this.patientLinkedList = new PatientLinkedList();
         
@@ -433,6 +435,8 @@ public class AddPatientPanel extends JPanel {
                 
                 clearForm();
                 loadPatients();
+                // Notify all listeners that patient data has changed
+                dataChangeManager.notifyPatientDataChanged();
             } else {
                 JOptionPane.showMessageDialog(this,
                     "Failed to register patient. Please try again.",

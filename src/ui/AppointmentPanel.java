@@ -18,9 +18,10 @@ import java.util.ArrayList;
  * AppointmentPanel class for booking and managing appointments
  * Includes form for appointment details and table showing all appointments
  */
-public class AppointmentPanel extends JPanel {
+public class AppointmentPanel extends JPanel implements DataChangeListener {
     private AppointmentDAO appointmentDAO;
     private PatientDAO patientDAO;
+    private DataChangeManager dataChangeManager;
     
     // Form fields
     private JTextField patientPhoneField;
@@ -49,6 +50,10 @@ public class AppointmentPanel extends JPanel {
     public AppointmentPanel(AppointmentDAO appointmentDAO, PatientDAO patientDAO) {
         this.appointmentDAO = appointmentDAO;
         this.patientDAO = patientDAO;
+        this.dataChangeManager = DataChangeManager.getInstance();
+        
+        // Register this panel as a listener for data changes
+        dataChangeManager.addListener(this);
         
         setLayout(new BorderLayout());
         setBackground(LIGHT_GRAY);
@@ -573,5 +578,33 @@ public class AppointmentPanel extends JPanel {
         appointmentDateField.setText("");
         reasonArea.setText("");
         selectedPatientId = -1;
+    }
+    
+    /**
+     * Called when doctor data changes (doctor added/updated/deleted)
+     * Refresh the doctor dropdown list
+     */
+    @Override
+    public void onDoctorDataChanged() {
+        loadDoctors();
+    }
+    
+    /**
+     * Called when patient data changes (patient added/updated/deleted)
+     * Refresh the patient data if needed
+     */
+    @Override
+    public void onPatientDataChanged() {
+        // Patient data changed, no immediate action needed in appointment panel
+        // unless a patient was deleted (which would require validation)
+    }
+    
+    /**
+     * Called when appointment data changes (appointment added/updated/deleted)
+     * Refresh the appointments table
+     */
+    @Override
+    public void onAppointmentDataChanged() {
+        loadAppointments();
     }
 }

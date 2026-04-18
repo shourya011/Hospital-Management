@@ -1,0 +1,24 @@
+# ============================================
+# DATABASE CONFIGURATION - TEMPLATE
+# ============================================
+# INSTRUCTIONS:
+# 1. Create a copy of this file named "db.properties"
+# 2. Fill in YOUR actual database credentials
+# 3. NEVER commit db.properties to Git
+# 4. The .gitignore file will prevent accidental commits
+# ============================================
+
+# MySQL JDBC Driver
+db.driver=com.mysql.cj.jdbc.Driver
+
+# Database URL - Update with your server address and database name
+# Default: localhost:3306, database: hospital_db
+# Format: jdbc:mysql://[HOST]:[PORT]/[DATABASE]?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+db.url=jdbc:mysql://127.0.0.1:3306/hospital_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+
+# Database username (typically 'root' for local development)
+db.user=root
+
+# Database password - NEVER push this to Git
+# This should match your MySQL root password
+db.password=your_password_here

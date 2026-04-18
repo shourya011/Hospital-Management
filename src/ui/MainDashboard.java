@@ -1,6 +1,7 @@
 package ui;
 
 import dao.AppointmentDAO;
+import dao.DoctorDAO;
 import dao.PatientDAO;
 import db.DBConnection;
 
@@ -26,10 +27,12 @@ public class MainDashboard extends JFrame {
     private JButton dashboardBtn;
     private JButton addPatientBtn;
     private JButton appointmentBtn;
+    private JButton doctorBtn;
     
     // DAOs
     private PatientDAO patientDAO;
     private AppointmentDAO appointmentDAO;
+    private DoctorDAO doctorDAO;
     
     // Color scheme
     private static final Color DARK_BLUE = new Color(0, 53, 102);
@@ -51,6 +54,7 @@ public class MainDashboard extends JFrame {
         // Initialize DAOs
         patientDAO = new PatientDAO();
         appointmentDAO = new AppointmentDAO();
+        doctorDAO = new DoctorDAO();
         
         // Setup UI
         setupUI();
@@ -151,9 +155,9 @@ public class MainDashboard extends JFrame {
         sidebar.add(Box.createVerticalStrut(10));
         sidebar.add(appointmentBtn);
         
-        // Greyed out buttons (disabled features)
-        JButton doctorsBtn = createNavButton("👨‍⚕️ Doctors", false);
-        doctorsBtn.setEnabled(false);
+        // Doctors button
+        doctorBtn = createNavButton("👨‍⚕️ Doctors", false);
+        doctorBtn.addActionListener(e -> switchPanel("doctor"));
         
         JButton billingBtn = createNavButton("💰 Billing", false);
         billingBtn.setEnabled(false);
@@ -162,7 +166,7 @@ public class MainDashboard extends JFrame {
         reportsBtn.setEnabled(false);
         
         sidebar.add(Box.createVerticalStrut(20));
-        sidebar.add(doctorsBtn);
+        sidebar.add(doctorBtn);
         sidebar.add(Box.createVerticalStrut(10));
         sidebar.add(billingBtn);
         sidebar.add(Box.createVerticalStrut(10));
@@ -217,9 +221,11 @@ public class MainDashboard extends JFrame {
         cardPanel.setBackground(LIGHT_GRAY);
         
         // Add panels
-        cardPanel.add(createDashboardPanel(), "dashboard");
+        dashboardPanel = createDashboardPanel();
+        cardPanel.add(dashboardPanel, "dashboard");
         cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
         cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
+        cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
         
         return cardPanel;
     }
@@ -342,6 +348,9 @@ public class MainDashboard extends JFrame {
         appointmentBtn.setBackground(panelName.equals("appointment") ? RED_ACCENT : LIGHT_BLUE);
         appointmentBtn.setFont(new Font("Segoe UI", panelName.equals("appointment") ? Font.BOLD : Font.PLAIN, 12));
         
+        doctorBtn.setBackground(panelName.equals("doctor") ? RED_ACCENT : LIGHT_BLUE);
+        doctorBtn.setFont(new Font("Segoe UI", panelName.equals("doctor") ? Font.BOLD : Font.PLAIN, 12));
+        
         // Update module label and refresh if switching to dashboard
         switch (panelName) {
             case "dashboard":
@@ -354,6 +363,9 @@ public class MainDashboard extends JFrame {
                 break;
             case "appointment":
                 currentModuleLabel.setText("Appointments");
+                break;
+            case "doctor":
+                currentModuleLabel.setText("Doctors");
                 break;
         }
     }

@@ -29,11 +29,17 @@ CREATE TABLE IF NOT EXISTS patients (
 -- Table: doctors
 CREATE TABLE IF NOT EXISTS doctors (
     doctor_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    specialization VARCHAR(100) NOT NULL,
-    phone VARCHAR(15),
-    available_days VARCHAR(100),
-    INDEX idx_specialization (specialization)
+    doctor_name VARCHAR(100) NOT NULL,
+    specialization VARCHAR(100),
+    phone_number VARCHAR(20),
+    email VARCHAR(100),
+    gender VARCHAR(20),
+    experience_years INT,
+    availability TEXT,
+    status VARCHAR(20),
+    registered_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_specialization (specialization),
+    INDEX idx_phone_number (phone_number)
 );
 
 -- Table: appointments

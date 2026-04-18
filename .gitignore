@@ -1,53 +1,171 @@
 # ============================================
-# CRITICAL: Database & Credentials
+# HOSPITAL MANAGEMENT SYSTEM - .gitignore
 # ============================================
+# IMPORTANT: This file prevents committing sensitive data
+# including passwords, API keys, local paths, and credentials.
+#
+# IF YOU HAVE ALREADY COMMITTED THESE FILES:
+# Run these commands to remove them from git history:
+#   git rm --cached db.properties
+#   git rm --cached SETUP.md
+#   git commit -m "Remove sensitive files from git tracking"
+#   git push
+#
+# Then add this in your commit message: "Removes sensitive data"
+# ============================================
+
+# ============================================
+# CRITICAL: Database & Credentials - NEVER COMMIT
+# ============================================
+# Contains passwords, usernames, database URLs, and local paths
+db.properties
 *.properties
+database.properties
+application.properties
+config.properties
+secrets.properties
+credentials.properties
+
+# Database configuration files
 config.xml
 connection.xml
 db.conf
-db/
+db.config
+persistence.xml
+.env
+.env.local
+.env.*.local
 
 # ============================================
-# CRITICAL: Documentation with secrets
+# CRITICAL: Local Setup Files with Sensitive Data
 # ============================================
+# Files that may contain local machine paths or personal info
 QUICKSTART.md
 SETUP.md
+LOCAL_SETUP.md
+DEPLOY_LOCAL.md
 AdvancedJava_Report.md
 
+# Database dumps that may contain local data
+*.sql
+!hospital_db.sql.example
+
 # ============================================
-# Java Compilation & Build
+# Java Compilation & Build - Auto-generated
 # ============================================
+# Do not commit compiled files - regenerate locally
 *.class
 *.jar
 *.war
+*.exe
 bin/
 out/
 target/
 dist/
+build/
+.gradle/
+*.o
+*.so
 
 # ============================================
-# IDE & Editor Files
+# IDE & Editor Files - Local Environment Specific
 # ============================================
+# These contain local paths and workspace settings
 .idea/
+.idea_modules/
+*.iml
 .vscode/
+.vscode/**
+*.code-workspace
 *.swp
 *.swo
 *~
 .DS_Store
-*.iml
+.AppleDouble
+.LSOverride
+Thumbs.db
+
 .classpath
 .project
 .settings/
 *.sublime-project
 *.sublime-workspace
 
+# Eclipse
+.metadata
+local.properties
+.cache/
+.sts4-cache/
+
+# NetBeans
+nbproject/
+.nb-gradle/
+.nbattrs
+
 # ============================================
-# Build Tools
+# OS-specific Files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.nautilus-metafile
+
+# ============================================
+# Build Tool Caches
 # ============================================
 .m2/
+.gradle/
+.ivy2/
 pom.xml.tag
 pom.xml.releaseBackup
-.gradle/
+pom.xml.versionsBackup
+pom.xml.backup
+release.properties
+.cache/
+
+# ============================================
+# Node/NPM (if any frontend included)
+# ============================================
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# ============================================
+# Logs & Temporary Files
+# ============================================
+*.log
+logs/
+*.log.*
+temp/
+tmp/
+*.tmp
+
+# ============================================
+# MacOS Finder
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ============================================
+# Git-related files
+# ============================================
+.git/config.local
+.gitconfig.local
 gradle-wrapper.jar
 gradle-wrapper.properties
 
