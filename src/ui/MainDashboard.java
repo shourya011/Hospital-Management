@@ -330,6 +330,7 @@ public class MainDashboard extends JFrame {
         cardPanel.remove(dashboardPanel);
         dashboardPanel = createDashboardPanel();
         cardPanel.add(dashboardPanel, "dashboard");
+        cardLayout.show(cardPanel, "dashboard");  // Ensure dashboard is displayed after refresh
     }
     
     /**

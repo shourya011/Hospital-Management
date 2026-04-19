@@ -33,6 +33,9 @@ public class AddDoctorPanel extends JPanel {
     // Search
     private JTextField searchPhoneField;
     
+    // Edit mode tracking
+    private int editingDoctorId = -1;
+    
     // Color scheme
     private static final Color DARK_BLUE = new Color(0, 53, 102);
     private static final Color LIGHT_GRAY = new Color(240, 240, 240);
@@ -207,7 +210,13 @@ public class AddDoctorPanel extends JPanel {
         registerBtn.setBorderPainted(false);
         registerBtn.setOpaque(true);
         registerBtn.setPreferredSize(new Dimension(200, 38));
-        registerBtn.addActionListener(e -> registerDoctor());
+        registerBtn.addActionListener(e -> {
+            if (editingDoctorId == -1) {
+                registerDoctor();
+            } else {
+                updateDoctor();
+            }
+        });
         buttonPanel.add(registerBtn);
         
         JButton clearBtn = new JButton("CLEAR FORM");
@@ -390,7 +399,7 @@ public class AddDoctorPanel extends JPanel {
     }
     
     /**
-     * Search doctors by phone number
+     * Search doctors by phone number (partial match)
      */
     private void searchDoctors() {
         String phone = searchPhoneField.getText().trim();
@@ -401,23 +410,33 @@ public class AddDoctorPanel extends JPanel {
         }
         
         tableModel.setRowCount(0);
-        Doctor doctor = doctorDAO.searchDoctorByPhone(phone);
+        ArrayList<Doctor> allDoctors = doctorDAO.getAllDoctors();
+        ArrayList<Doctor> results = new ArrayList<>();
         
-        if (doctor != null) {
-            tableModel.addRow(new Object[]{
-                doctor.getDoctorId(),
-                doctor.getDoctorName(),
-                doctor.getSpecialization(),
-                doctor.getPhoneNumber(),
-                doctor.getEmail(),
-                doctor.getGender(),
-                doctor.getExperienceYears(),
-                doctor.getStatus()
-            });
-        } else {
+        // Search with partial match (contains)
+        for (Doctor doctor : allDoctors) {
+            if (doctor.getPhoneNumber().contains(phone)) {
+                results.add(doctor);
+            }
+        }
+        
+        if (results.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No doctor found with that phone number!",
                     "Search Result", JOptionPane.INFORMATION_MESSAGE);
             loadDoctors();
+        } else {
+            for (Doctor doctor : results) {
+                tableModel.addRow(new Object[]{
+                    doctor.getDoctorId(),
+                    doctor.getDoctorName(),
+                    doctor.getSpecialization(),
+                    doctor.getPhoneNumber(),
+                    doctor.getEmail(),
+                    doctor.getGender(),
+                    doctor.getExperienceYears(),
+                    doctor.getStatus()
+                });
+            }
         }
     }
     
@@ -474,6 +493,9 @@ public class AddDoctorPanel extends JPanel {
         Doctor doctor = doctorDAO.getDoctorById(doctorId);
         
         if (doctor != null) {
+            // Set editing mode
+            editingDoctorId = doctorId;
+            
             // Populate form with doctor data
             doctorNameField.setText(doctor.getDoctorName());
             specializationCombo.setSelectedItem(doctor.getSpecialization());
@@ -484,42 +506,54 @@ public class AddDoctorPanel extends JPanel {
             availabilityArea.setText(doctor.getAvailability());
             statusCombo.setSelectedItem(doctor.getStatus());
             
-            // Show confirmation dialog
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Update doctor information?", "Confirm Update", JOptionPane.YES_NO_OPTION);
+            JOptionPane.showMessageDialog(this, "Edit the fields and click 'REGISTER DOCTOR' button to save changes.",
+                    "Edit Mode", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    /**
+     * Update an existing doctor
+     */
+    private void updateDoctor() {
+        String doctorName = doctorNameField.getText().trim();
+        String specialization = (String) specializationCombo.getSelectedItem();
+        String phoneNumber = phoneNumberField.getText().trim();
+        String email = emailField.getText().trim();
+        String gender = (String) genderCombo.getSelectedItem();
+        int experienceYears = (Integer) experienceYearsSpinner.getValue();
+        String availability = availabilityArea.getText().trim();
+        String status = (String) statusCombo.getSelectedItem();
+        
+        // Validation
+        if (doctorName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || availability.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields!",
+                    "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Get the doctor and update it
+        Doctor doctor = doctorDAO.getDoctorById(editingDoctorId);
+        if (doctor != null) {
+            doctor.setDoctorName(doctorName);
+            doctor.setSpecialization(specialization);
+            doctor.setPhoneNumber(phoneNumber);
+            doctor.setEmail(email);
+            doctor.setGender(gender);
+            doctor.setExperienceYears(experienceYears);
+            doctor.setAvailability(availability);
+            doctor.setStatus(status);
             
-            if (confirm == JOptionPane.YES_OPTION) {
-                String doctorName = doctorNameField.getText().trim();
-                String specialization = (String) specializationCombo.getSelectedItem();
-                String phoneNumber = phoneNumberField.getText().trim();
-                String email = emailField.getText().trim();
-                String gender = (String) genderCombo.getSelectedItem();
-                int experienceYears = (Integer) experienceYearsSpinner.getValue();
-                String availability = availabilityArea.getText().trim();
-                String status = (String) statusCombo.getSelectedItem();
-                
-                doctor.setDoctorName(doctorName);
-                doctor.setSpecialization(specialization);
-                doctor.setPhoneNumber(phoneNumber);
-                doctor.setEmail(email);
-                doctor.setGender(gender);
-                doctor.setExperienceYears(experienceYears);
-                doctor.setAvailability(availability);
-                doctor.setStatus(status);
-                
-                if (doctorDAO.updateDoctor(doctor)) {
-                    JOptionPane.showMessageDialog(this, "Doctor updated successfully!",
-                            "Success", JOptionPane.INFORMATION_MESSAGE);
-                    clearForm();
-                    loadDoctors();
-                    // Notify all listeners that doctor data has changed
-                    dataChangeManager.notifyDoctorDataChanged();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Failed to update doctor!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
+            if (doctorDAO.updateDoctor(doctor)) {
+                JOptionPane.showMessageDialog(this, "Doctor updated successfully!",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                editingDoctorId = -1;
                 clearForm();
+                loadDoctors();
+                // Notify all listeners that doctor data has changed
+                dataChangeManager.notifyDoctorDataChanged();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update doctor!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -561,6 +595,7 @@ public class AddDoctorPanel extends JPanel {
      * Clear the form
      */
     private void clearForm() {
+        editingDoctorId = -1;
         doctorNameField.setText("");
         specializationCombo.setSelectedIndex(0);
         phoneNumberField.setText("");
