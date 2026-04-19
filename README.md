@@ -251,6 +251,42 @@ java -cp "bin;lib\mysql-connector-java-8.x.jar" Main
 - [ ] Staff management
 - [ ] SMS/Email notifications
 
+## References
+
+### Languages & Technologies
+- Java SE 11 - https://docs.oracle.com/en/java/javase/11/
+- Java Swing GUI Toolkit - https://docs.oracle.com/javase/tutorial/uiswing/
+- JDBC (Java Database Connectivity) - https://docs.oracle.com/javase/tutorial/jdbc/
+
+### Database
+- MySQL 8.0 Documentation - https://dev.mysql.com/doc/refman/8.0/en/
+- MySQL Connector/J (JDBC Driver) - https://dev.mysql.com/downloads/connector/j/
+- MySQL Workbench - https://www.mysql.com/products/workbench/
+
+### Design Patterns Used
+- Singleton Pattern (DBConnection) - https://refactoring.guru/design-patterns/singleton
+- DAO Pattern (Data Access Object) - https://www.oracle.com/java/technologies/dataaccessobject.html
+- MVC Pattern (Model View Controller) - https://www.oracle.com/technical-resources/articles/javase/mvc.html
+
+### Data Structures
+- Linked List - https://www.geeksforgeeks.org/linked-list-data-structure/
+- Queue Data Structure - https://www.geeksforgeeks.org/queue-data-structure/
+
+### IDE & Tools
+- Apache NetBeans IDE - https://netbeans.apache.org/
+- GitHub Version Control - https://github.com/
+- MySQL Workbench - https://www.mysql.com/products/workbench/
+
+### Learning Resources
+- Java Swing Tutorial - https://www.javatpoint.com/java-swing
+- JDBC Tutorial - https://www.javatpoint.com/java-jdbc
+- MySQL Tutorial - https://www.w3schools.com/mysql/
+- Java OOP Concepts - https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/
+- DAO Design Pattern - https://www.baeldung.com/java-dao-pattern
+
+
+
+
 ## License
 
 This project is for educational purposes.
