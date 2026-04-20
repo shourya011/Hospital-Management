@@ -26,4 +26,4 @@ echo "Starting Hospital Management System..."
 echo ""
 
 # Run the application
-java -cp "bin:lib/mysql-connector-*.jar" Main
+java -cp "bin:lib/*" Main

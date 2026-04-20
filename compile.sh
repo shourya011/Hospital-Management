@@ -47,6 +47,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Compile datastructure package
+echo "Compiling datastructure package..."
+$JAVAC -cp "bin:lib/*" -d bin src/datastructure/*.java 2>&1
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to compile datastructure package"
+    exit 1
+fi
+
 # Compile dao package
 echo "Compiling dao package..."
 $JAVAC -cp "bin:lib/*" -d bin src/dao/*.java 2>&1
@@ -54,10 +62,6 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Failed to compile dao package"
     exit 1
 fi
-
-# Compile datastructure package
-echo "Compiling datastructure package..."
-$JAVAC -cp "bin:lib/*" -d bin src/datastructure/*.java 2>&1
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to compile datastructure package"
     exit 1

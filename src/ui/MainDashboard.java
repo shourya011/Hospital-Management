@@ -28,6 +28,7 @@ public class MainDashboard extends JFrame {
     private JButton addPatientBtn;
     private JButton appointmentBtn;
     private JButton doctorBtn;
+    private JButton reportsBtn;
     
     // DAOs
     private PatientDAO patientDAO;
@@ -162,8 +163,9 @@ public class MainDashboard extends JFrame {
         JButton billingBtn = createNavButton("💰 Billing", false);
         billingBtn.setEnabled(false);
         
-        JButton reportsBtn = createNavButton("📈 Reports", false);
-        reportsBtn.setEnabled(false);
+        reportsBtn = createNavButton("📈 Reports", false);
+        reportsBtn.setEnabled(true);
+        reportsBtn.addActionListener(e -> switchPanel("reports"));
         
         sidebar.add(Box.createVerticalStrut(20));
         sidebar.add(doctorBtn);
@@ -226,6 +228,7 @@ public class MainDashboard extends JFrame {
         cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
         cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
         cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
+        cardPanel.add(new ReportPanel(), "reports");
         
         return cardPanel;
     }
@@ -352,6 +355,11 @@ public class MainDashboard extends JFrame {
         doctorBtn.setBackground(panelName.equals("doctor") ? RED_ACCENT : LIGHT_BLUE);
         doctorBtn.setFont(new Font("Segoe UI", panelName.equals("doctor") ? Font.BOLD : Font.PLAIN, 12));
         
+        if (reportsBtn != null) {
+            reportsBtn.setBackground(panelName.equals("reports") ? RED_ACCENT : LIGHT_BLUE);
+            reportsBtn.setFont(new Font("Segoe UI", panelName.equals("reports") ? Font.BOLD : Font.PLAIN, 12));
+        }
+        
         // Update module label and refresh if switching to dashboard
         switch (panelName) {
             case "dashboard":
@@ -367,6 +375,9 @@ public class MainDashboard extends JFrame {
                 break;
             case "doctor":
                 currentModuleLabel.setText("Doctors");
+                break;
+            case "reports":
+                currentModuleLabel.setText("Reports & Analytics");
                 break;
         }
     }
