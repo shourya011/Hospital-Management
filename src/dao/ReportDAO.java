@@ -162,4 +162,63 @@ public class ReportDAO {
         
         return list.getAll();
     }
-}
+
+    // ─── Billing Stats ─────────────────────────────────────────────────────────
+
+    /**
+     * Total revenue from all Paid bills
+     */
+    public double getBillingTotalRevenue() {
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT COALESCE(SUM(total_amount),0) AS rev FROM bills WHERE payment_status='Paid'";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getDouble("rev");
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0.0;
+    }
+
+    /**
+     * Count of Pending or Partially Paid bills
+     */
+    public int getBillingPendingCount() {
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT COUNT(*) AS cnt FROM bills WHERE payment_status IN ('Pending','Partially Paid')";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt("cnt");
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /**
+     * Today's total collections (Paid bills billed today)
+     */
+    public double getBillingTodayCollections() {
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT COALESCE(SUM(total_amount),0) AS today FROM bills " +
+                     "WHERE DATE(bill_date)=CURDATE() AND payment_status='Paid'";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getDouble("today");
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0.0;
+    }
+
+    /**
+     * Revenue grouped by payment mode
+     */
+    public ArrayList<ReportRow> getBillingRevenueByMode() {
+        ReportDataList<ReportRow> list = new ReportDataList<>();
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT payment_mode, COUNT(*) AS cnt FROM bills " +
+                     "WHERE payment_status='Paid' GROUP BY payment_mode ORDER BY cnt DESC";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(new ReportRow(rs.getString("payment_mode"), rs.getInt("cnt")));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list.getAll();
+    }
+}

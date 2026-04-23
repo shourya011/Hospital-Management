@@ -63,3 +63,57 @@ CREATE TABLE IF NOT EXISTS appointments (
 
 -- NOTE: Sample data has been removed to preserve user-added records
 -- All existing patient and appointment records will be retained
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Table: bills
+-- Billing Module — added in v1.1
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS bills (
+    bill_id            INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id         INT NOT NULL,
+    appointment_id     INT DEFAULT NULL,
+    bill_number        VARCHAR(30) NOT NULL UNIQUE,
+    consultation_fee   DECIMAL(10,2) DEFAULT 0.00,
+    medicine_charges   DECIMAL(10,2) DEFAULT 0.00,
+    room_charges       DECIMAL(10,2) DEFAULT 0.00,
+    lab_charges        DECIMAL(10,2) DEFAULT 0.00,
+    other_charges      DECIMAL(10,2) DEFAULT 0.00,
+    discount           DECIMAL(10,2) DEFAULT 0.00,
+    tax                DECIMAL(10,2) DEFAULT 0.00,
+    total_amount       DECIMAL(10,2) DEFAULT 0.00,
+    payment_status     ENUM('Pending','Paid','Partially Paid') DEFAULT 'Pending',
+    payment_mode       ENUM('Cash','Card','UPI','Insurance') DEFAULT 'Cash',
+    bill_date          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    notes              TEXT,
+    FOREIGN KEY (patient_id)     REFERENCES patients(patient_id) ON DELETE CASCADE,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id) ON DELETE SET NULL,
+    INDEX idx_bill_patient   (patient_id),
+    INDEX idx_bill_status    (payment_status),
+    INDEX idx_bill_date      (bill_date)
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed Data: 5 sample bills
+-- Run ONLY on a fresh setup (skip if bills table already has data).
+-- patient_id values must match existing rows in your patients table.
+-- ─────────────────────────────────────────────────────────────────────────────
+INSERT IGNORE INTO bills
+    (patient_id, appointment_id, bill_number,
+     consultation_fee, medicine_charges, room_charges, lab_charges, other_charges,
+     discount, tax, total_amount, payment_status, payment_mode, notes)
+VALUES
+    (1, NULL, 'RBH-BILL-20260401-0001',
+     500.00, 300.00, 0.00, 200.00, 50.00, 0.00, 52.50, 1102.50, 'Paid', 'Cash',
+     'Routine check-up'),
+    (2, NULL, 'RBH-BILL-20260405-0001',
+     750.00, 500.00, 1200.00, 400.00, 100.00, 100.00, 142.50, 2992.50, 'Paid', 'Card',
+     'Admitted for observation'),
+    (3, NULL, 'RBH-BILL-20260410-0001',
+     500.00, 150.00, 0.00, 0.00, 0.00, 0.00, 32.50, 682.50, 'Pending', 'UPI',
+     'Awaiting payment'),
+    (4, NULL, 'RBH-BILL-20260415-0001',
+     1000.00, 800.00, 2400.00, 600.00, 200.00, 200.00, 240.00, 5040.00, 'Paid', 'Insurance',
+     'Surgery follow-up'),
+    (5, NULL, 'RBH-BILL-20260420-0001',
+     500.00, 250.00, 0.00, 350.00, 0.00, 50.00, 52.50, 1102.50, 'Partially Paid', 'Cash',
+     'Partial payment received');
