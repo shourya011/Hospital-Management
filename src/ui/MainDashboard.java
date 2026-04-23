@@ -62,7 +62,7 @@ public class MainDashboard extends JFrame {
      * Constructor initializing the main dashboard
      */
     public MainDashboard() {
-        setTitle("RBH - Hospital Management System");
+        setTitle("Birla CK Hospital - Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 700);
         setLocationRelativeTo(null);
@@ -112,10 +112,8 @@ public class MainDashboard extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));  // [UI CHANGE] Adjusted padding
         topPanel.setPreferredSize(new Dimension(0, 50));  // [UI CHANGE] Reduced height for cleaner look
         
-        // Left side: Hospital name
-        JLabel hospitalName = new JLabel("RBH - Hospital Management System");
-        hospitalName.setFont(new Font("Segoe UI", Font.BOLD, 16));  // [UI CHANGE] Adjusted font size
-        hospitalName.setForeground(WHITE);
+        // Left side: Logo or hospital name with fallback
+        JComponent logoComponent = createHeaderLogoComponent();
         
         // Center: Current module name
         currentModuleLabel = new JLabel("Dashboard");
@@ -127,11 +125,43 @@ public class MainDashboard extends JFrame {
         dateTimeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));  // [UI CHANGE] Updated to 11pt
         dateTimeLabel.setForeground(new Color(255, 255, 255, 200));  // [UI CHANGE] More transparent white
         
-        topPanel.add(hospitalName, BorderLayout.WEST);
+        topPanel.add(logoComponent, BorderLayout.WEST);
         topPanel.add(currentModuleLabel, BorderLayout.CENTER);
         topPanel.add(dateTimeLabel, BorderLayout.EAST);
         
         return topPanel;
+    }
+    
+    /**
+     * Create header logo component - displays logo image or fallback text
+     */
+    private JComponent createHeaderLogoComponent() {
+        // Try to load rbh.webp logo image
+        try {
+            File logoFile = new File("rbh.webp");
+            if (logoFile.exists()) {
+                BufferedImage logoImage = ImageIO.read(logoFile);
+                if (logoImage != null) {
+                    // Scale logo to fit header (height 50px, maintain aspect ratio)
+                    int maxHeight = 45;
+                    int scaledWidth = (int) (logoImage.getWidth() * (maxHeight / (double) logoImage.getHeight()));
+                    Image scaledImage = logoImage.getScaledInstance(scaledWidth, maxHeight, Image.SCALE_SMOOTH);
+                    
+                    JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
+                    logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    System.out.println("✓ Successfully loaded rbh.webp logo in header");
+                    return logoLabel;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Note: Could not load rbh.webp logo - using fallback text. (" + e.getMessage() + ")");
+        }
+        
+        // Fallback: Display "Birla CK Hospital" text
+        JLabel hospitalName = new JLabel("Birla CK Hospital");
+        hospitalName.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        hospitalName.setForeground(WHITE);
+        return hospitalName;
     }
     
     /**
