@@ -1,6 +1,7 @@
 package ui;
 
 import dao.AppointmentDAO;
+import dao.BillDAO;
 import dao.DoctorDAO;
 import dao.PatientDAO;
 import db.DBConnection;
@@ -28,12 +29,14 @@ public class MainDashboard extends JFrame {
     private JButton addPatientBtn;
     private JButton appointmentBtn;
     private JButton doctorBtn;
+    private JButton billingBtn;
     private JButton reportsBtn;
     
     // DAOs
     private PatientDAO patientDAO;
     private AppointmentDAO appointmentDAO;
     private DoctorDAO doctorDAO;
+    private BillDAO billDAO;
     
     // Color scheme
     private static final Color DARK_BLUE = new Color(0, 53, 102);
@@ -56,6 +59,7 @@ public class MainDashboard extends JFrame {
         patientDAO = new PatientDAO();
         appointmentDAO = new AppointmentDAO();
         doctorDAO = new DoctorDAO();
+        billDAO = new BillDAO();
         
         // Setup UI
         setupUI();
@@ -160,11 +164,10 @@ public class MainDashboard extends JFrame {
         doctorBtn = createNavButton("👨‍⚕️ Doctors", false);
         doctorBtn.addActionListener(e -> switchPanel("doctor"));
         
-        JButton billingBtn = createNavButton("💰 Billing", false);
-        billingBtn.setEnabled(false);
+        billingBtn = createNavButton("💰 Billing", false);
+        billingBtn.addActionListener(e -> switchPanel("billing"));
         
         reportsBtn = createNavButton("📈 Reports", false);
-        reportsBtn.setEnabled(true);
         reportsBtn.addActionListener(e -> switchPanel("reports"));
         
         sidebar.add(Box.createVerticalStrut(20));
@@ -228,6 +231,7 @@ public class MainDashboard extends JFrame {
         cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
         cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
         cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
+        cardPanel.add(new BillingPanel(billDAO, patientDAO), "billing");
         cardPanel.add(new ReportPanel(), "reports");
         
         return cardPanel;
@@ -355,6 +359,11 @@ public class MainDashboard extends JFrame {
         doctorBtn.setBackground(panelName.equals("doctor") ? RED_ACCENT : LIGHT_BLUE);
         doctorBtn.setFont(new Font("Segoe UI", panelName.equals("doctor") ? Font.BOLD : Font.PLAIN, 12));
         
+        if (billingBtn != null) {
+            billingBtn.setBackground(panelName.equals("billing") ? RED_ACCENT : LIGHT_BLUE);
+            billingBtn.setFont(new Font("Segoe UI", panelName.equals("billing") ? Font.BOLD : Font.PLAIN, 12));
+        }
+        
         if (reportsBtn != null) {
             reportsBtn.setBackground(panelName.equals("reports") ? RED_ACCENT : LIGHT_BLUE);
             reportsBtn.setFont(new Font("Segoe UI", panelName.equals("reports") ? Font.BOLD : Font.PLAIN, 12));
@@ -375,6 +384,9 @@ public class MainDashboard extends JFrame {
                 break;
             case "doctor":
                 currentModuleLabel.setText("Doctors");
+                break;
+            case "billing":
+                currentModuleLabel.setText("Billing");
                 break;
             case "reports":
                 currentModuleLabel.setText("Reports & Analytics");

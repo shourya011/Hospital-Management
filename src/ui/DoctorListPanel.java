@@ -478,4 +478,12 @@ public class DoctorListPanel extends JPanel implements DataChangeListener {
     public void onAppointmentDataChanged() {
         // No action needed for appointment changes in doctor list
     }
+
+    /**
+     * Called when bill data changes — no action needed in this panel
+     */
+    @Override
+    public void onBillDataChanged() {
+        // No action needed for bill changes in doctor list
+    }
 }
