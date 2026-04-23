@@ -73,4 +73,13 @@ public class DataChangeManager {
             listener.onAppointmentDataChanged();
         }
     }
+
+    /**
+     * Notify all listeners that bill data has changed
+     */
+    public void notifyBillDataChanged() {
+        for (DataChangeListener listener : listeners) {
+            listener.onBillDataChanged();
+        }
+    }
 }

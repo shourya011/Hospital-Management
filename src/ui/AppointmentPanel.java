@@ -607,4 +607,12 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
     public void onAppointmentDataChanged() {
         loadAppointments();
     }
+
+    /**
+     * Called when bill data changes — no action needed in this panel
+     */
+    @Override
+    public void onBillDataChanged() {
+        // No action needed in appointment panel
+    }
 }

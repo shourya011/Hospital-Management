@@ -69,7 +69,9 @@ public class ReportPanel extends JPanel {
             "Specialization-wise Appointments", 
             "Patient Demographics", 
             "Monthly Patient Registrations",
-            "Total Summary Stats"
+            "Total Summary Stats",
+            "Billing Revenue by Mode",
+            "Billing Summary Stats"
         };
         reportTypeCombo = new JComboBox<>(reportTypes);
 
@@ -192,6 +194,17 @@ public class ReportPanel extends JPanel {
             results = reportDAO.getMonthlyRegistrations(cal.get(Calendar.YEAR));
         } else if ("Total Summary Stats".equals(type)) {
             results = reportDAO.getTotalSummaryStats(from, to);
+        } else if ("Billing Revenue by Mode".equals(type)) {
+            results = reportDAO.getBillingRevenueByMode();
+        } else if ("Billing Summary Stats".equals(type)) {
+            // Build ad-hoc billing summary as ReportRow list
+            results = new java.util.ArrayList<>();
+            results.add(new model.ReportRow("Total Revenue (Paid)",
+                (int) reportDAO.getBillingTotalRevenue()));
+            results.add(new model.ReportRow("Pending Payments Count",
+                reportDAO.getBillingPendingCount()));
+            results.add(new model.ReportRow("Today's Collections",
+                (int) reportDAO.getBillingTodayCollections()));
         }
 
         tableModel.setRowCount(0);
