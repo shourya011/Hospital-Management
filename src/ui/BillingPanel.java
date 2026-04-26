@@ -46,13 +46,31 @@ public class BillingPanel extends JPanel implements DataChangeListener {
     private int selectedBillId    = -1;
 
     // Colors — match project theme exactly
-    private static final Color DARK_BLUE  = new Color(0, 53, 102);
-    private static final Color LIGHT_BLUE = new Color(30, 80, 140);
-    private static final Color RED_ACCENT = new Color(214, 40, 40);
-    private static final Color LIGHT_GRAY = new Color(240, 240, 240);
-    private static final Color WHITE      = Color.WHITE;
-    private static final Color GREEN      = new Color(52, 168, 83);
-    private static final Color ORANGE     = new Color(230, 126, 34);
+    // Modern CK Birla Color Palette (matches MainDashboard)
+    private static final Color COLOR_PRIMARY = new Color(192, 39, 45);       // CK Birla red
+    private static final Color COLOR_PRIMARY_DARK = new Color(155, 29, 34);  // hover/pressed
+    private static final Color COLOR_NAVY = new Color(27, 58, 107);          // headings
+    private static final Color COLOR_BG_PAGE = new Color(247, 248, 250);     // page background
+    private static final Color COLOR_BG_CARD = Color.WHITE;                  // card background
+    private static final Color COLOR_TEXT_BODY = new Color(74, 74, 74);      // general text
+    private static final Color COLOR_BORDER = new Color(229, 231, 235);      // borders
+    private static final Color COLOR_SUCCESS = new Color(29, 158, 117);      // success
+    private static final Color COLOR_TEXT_MUTED = new Color(150, 150, 160);  // secondary labels
+    
+    // Fonts (matching MainDashboard)
+    private static final Font FONT_HEADING = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font FONT_SUBHEAD = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
+    
+    // Backward compatibility aliases
+    private static final Color DARK_BLUE = COLOR_NAVY;
+    private static final Color LIGHT_BLUE = COLOR_NAVY;
+    private static final Color RED_ACCENT = COLOR_PRIMARY;
+    private static final Color LIGHT_GRAY = COLOR_BG_PAGE;
+    private static final Color WHITE = Color.WHITE;
+    private static final Color GREEN = COLOR_SUCCESS;
+    private static final Color ORANGE = new Color(230, 126, 34);
 
     public BillingPanel(BillDAO billDAO, PatientDAO patientDAO) {
         this.billDAO           = billDAO;
@@ -236,8 +254,12 @@ public class BillingPanel extends JPanel implements DataChangeListener {
 
         JScrollPane scroll = new JScrollPane(form);
         scroll.setBorder(null);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setBackground(LIGHT_GRAY);
+        wrap.setPreferredSize(new Dimension(370, 600));
         wrap.add(scroll);
         return wrap;
     }

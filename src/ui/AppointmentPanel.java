@@ -35,12 +35,29 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
     private JTable appointmentTable;
     private DefaultTableModel tableModel;
     
-    // Color scheme
-    private static final Color DARK_BLUE = new Color(0, 53, 102);
-    private static final Color LIGHT_GRAY = new Color(240, 240, 240);
-    private static final Color RED_ACCENT = new Color(214, 40, 40);
+    // Modern CK Birla Color Palette (matches MainDashboard)
+    private static final Color COLOR_PRIMARY = new Color(192, 39, 45);       // CK Birla red
+    private static final Color COLOR_PRIMARY_DARK = new Color(155, 29, 34);  // hover/pressed
+    private static final Color COLOR_NAVY = new Color(27, 58, 107);          // headings
+    private static final Color COLOR_BG_PAGE = new Color(247, 248, 250);     // page background
+    private static final Color COLOR_BG_CARD = Color.WHITE;                  // card background
+    private static final Color COLOR_TEXT_BODY = new Color(74, 74, 74);      // general text
+    private static final Color COLOR_BORDER = new Color(229, 231, 235);      // borders
+    private static final Color COLOR_SUCCESS = new Color(29, 158, 117);      // success/active
+    private static final Color COLOR_TEXT_MUTED = new Color(150, 150, 160);  // secondary labels
+    
+    // Fonts (matching MainDashboard)
+    private static final Font FONT_HEADING = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font FONT_SUBHEAD = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
+    
+    // Backward compatibility aliases
+    private static final Color DARK_BLUE = COLOR_NAVY;
+    private static final Color LIGHT_GRAY = COLOR_BG_PAGE;
+    private static final Color RED_ACCENT = COLOR_PRIMARY;
     private static final Color WHITE = Color.WHITE;
-    private static final Color GREEN = new Color(52, 168, 83);
+    private static final Color GREEN = COLOR_SUCCESS;
     
     private int selectedPatientId = -1;
     
@@ -56,15 +73,15 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
         dataChangeManager.addListener(this);
         
         setLayout(new BorderLayout());
-        setBackground(LIGHT_GRAY);
+        setBackground(COLOR_BG_PAGE);
         
         // Title panel
         add(createTitlePanel(), BorderLayout.NORTH);
         
         // Main content
         JPanel mainContent = new JPanel(new BorderLayout(10, 10));
-        mainContent.setBackground(LIGHT_GRAY);
-        mainContent.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        mainContent.setBackground(COLOR_BG_PAGE);
+        mainContent.setBorder(BorderFactory.createEmptyBorder(24, 40, 24, 40));
         
         mainContent.add(createFormPanel(), BorderLayout.WEST);
         mainContent.add(createTablePanel(), BorderLayout.CENTER);
@@ -80,12 +97,12 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
      */
     private JPanel createTitlePanel() {
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(DARK_BLUE);
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        titlePanel.setBackground(COLOR_NAVY);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 24, 15, 24));
         
         JLabel titleLabel = new JLabel("Book Appointment");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        titleLabel.setForeground(WHITE);
+        titleLabel.setFont(FONT_HEADING);
+        titleLabel.setForeground(Color.WHITE);
         
         titlePanel.add(titleLabel);
         return titlePanel;
@@ -97,10 +114,10 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
     private JPanel createFormPanel() {
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBackground(WHITE);
+        formPanel.setBackground(COLOR_BG_CARD);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createLineBorder(COLOR_BORDER),
+                BorderFactory.createEmptyBorder(24, 20, 24, 20)
         ));
         formPanel.setPreferredSize(new Dimension(400, 0));
         
@@ -111,21 +128,25 @@ public class AppointmentPanel extends JPanel implements DataChangeListener {
         phonePanel.setOpaque(false);
         
         JLabel phoneLabel = new JLabel("Patient Phone");
-        phoneLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        phoneLabel.setForeground(new Color(80, 80, 80));
+        phoneLabel.setFont(FONT_SMALL);
+        phoneLabel.setForeground(COLOR_TEXT_MUTED);
         
         patientPhoneField = new JTextField();
-        patientPhoneField.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        patientPhoneField.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        patientPhoneField.setFont(FONT_BODY);
+        patientPhoneField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COLOR_BORDER),
+            BorderFactory.createEmptyBorder(8, 8, 8, 8)
+        ));
         
         JButton findBtn = new JButton("FIND PATIENT");
-        findBtn.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        findBtn.setBackground(DARK_BLUE);
-        findBtn.setForeground(WHITE);
+        findBtn.setFont(FONT_SMALL);
+        findBtn.setBackground(COLOR_NAVY);
+        findBtn.setForeground(Color.WHITE);
         findBtn.setFocusPainted(false);
         findBtn.setBorderPainted(false);
         findBtn.setOpaque(true);
-        findBtn.setPreferredSize(new Dimension(120, 30));
+        findBtn.setPreferredSize(new Dimension(120, 32));
+        findBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         findBtn.addActionListener(e -> findPatient());
         
         JPanel phoneLabelPanel = new JPanel(new BorderLayout());

@@ -26,10 +26,8 @@ public class MainDashboard extends JFrame {
     private JPanel cardPanel;
     private CardLayout cardLayout;
     private JPanel dashboardPanel;
-    private JLabel dateTimeLabel;
-    private JLabel currentModuleLabel;
     
-    // Sidebar buttons
+    // Navbar buttons
     private JButton dashboardBtn;
     private JButton addPatientBtn;
     private JButton appointmentBtn;
@@ -43,20 +41,24 @@ public class MainDashboard extends JFrame {
     private DoctorDAO doctorDAO;
     private BillDAO billDAO;
     
-    // [UI CHANGE] Color scheme - Updated to match CK Birla Hospital website aesthetic
-    private static final Color PRIMARY_RED = new Color(0xC8102E);          // Hospital brand red
-    private static final Color DARK_GRAY = new Color(0x4A4A4A);            // Text and headings
-    private static final Color STEEL_GRAY = new Color(0x607D8B);           // Secondary elements
-    private static final Color LIGHT_STEEL = new Color(0x78909C);          // Tertiary elements
-    private static final Color WHITE = Color.WHITE;                        // #FFFFFF
-    private static final Color LIGHT_GRAY = new Color(0xF5F5F5);           // Page background
-    private static final Color ACCENT_PINK = new Color(0xFFEBEE);          // Stats bar background
-    private static final Color HOVER_RED = new Color(0x9B0D22);            // Button hover state
+    // Modern CK Birla Hospitals Color Palette
+    private static final Color COLOR_PRIMARY = new Color(192, 39, 45);       // CK Birla red (#C0272D)
+    private static final Color COLOR_PRIMARY_DARK = new Color(155, 29, 34);  // hover/pressed red (#9B1D22)
+    private static final Color COLOR_NAVY = new Color(27, 58, 107);          // headings, navbar (#1B3A6B)
+    private static final Color COLOR_BG_PAGE = new Color(247, 248, 250);     // frame/panel bg (#F7F8FA)
+    private static final Color COLOR_BG_CARD = Color.WHITE;                  // card background
+    private static final Color COLOR_TEXT_BODY = new Color(74, 74, 74);      // general text (#4A4A4A)
+    private static final Color COLOR_BORDER = new Color(229, 231, 235);      // panel borders (#E5E7EB)
+    private static final Color COLOR_SUCCESS = new Color(29, 158, 117);      // active status (#1D9E75)
+    private static final Color COLOR_TEXT_MUTED = new Color(150, 150, 160);  // secondary labels
     
-    // [UI CHANGE] Keeping legacy names mapped for easier maintenance
-    private static final Color DARK_BLUE = PRIMARY_RED;                    // Maps to primary red
-    private static final Color LIGHT_BLUE = STEEL_GRAY;                    // Maps to steel gray
-    private static final Color RED_ACCENT = PRIMARY_RED;                   // Maps to primary red
+    // Font Definitions
+    private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 28);
+    private static final Font FONT_HEADING = new Font("Segoe UI", Font.BOLD, 18);
+    private static final Font FONT_SUBHEAD = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
+    private static final Font FONT_LOGO = new Font("Segoe UI", Font.BOLD, 16);
     
     /**
      * Constructor initializing the main dashboard
@@ -77,271 +79,160 @@ public class MainDashboard extends JFrame {
         // Setup UI
         setupUI();
         
-        // Start timer for date/time update
-        startDateTimeUpdater();
-        
         setVisible(true);
     }
     
     /**
-     * Setup the main user interface
+     * Setup the main user interface with modern top navbar layout
      */
     private void setupUI() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        setLayout(new BorderLayout());
         
-        // Top Panel with header and date/time
-        mainPanel.add(createTopPanel(), BorderLayout.NORTH);
+        // Top Navigation Bar
+        add(createTopNavbar(), BorderLayout.NORTH);
         
-        // Main content area with sidebar and card panel
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.add(createSidebar(), BorderLayout.WEST);
-        contentPanel.add(createCardPanel(), BorderLayout.CENTER);
+        // Main Content Area (scrollable)
+        JScrollPane mainScrollPane = new JScrollPane(createMainContent());
+        mainScrollPane.setBorder(null);
+        mainScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        add(mainScrollPane, BorderLayout.CENTER);
         
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
-        
-        setContentPane(mainPanel);
+        // Footer Bar
+        add(createFooter(), BorderLayout.SOUTH);
     }
     
     /**
-     * Create the top panel with header and date/time
+     * Create the modern top navigation bar
      */
-    private JPanel createTopPanel() {
-        // [UI CHANGE] Updated top navigation bar styling to match hospital website
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(PRIMARY_RED);  // [UI CHANGE] Changed from DARK_BLUE to PRIMARY_RED (#C8102E)
-        topPanel.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));  // [UI CHANGE] Adjusted padding
-        topPanel.setPreferredSize(new Dimension(0, 50));  // [UI CHANGE] Reduced height for cleaner look
+    private JPanel createTopNavbar() {
+        JPanel navBar = new JPanel(new BorderLayout(16, 0));
+        navBar.setBackground(COLOR_NAVY);
+        navBar.setPreferredSize(new Dimension(0, 68));
+        navBar.setBorder(BorderFactory.createEmptyBorder(12, 24, 12, 24));
         
-        // Left side: Logo or hospital name with fallback
-        JComponent logoComponent = createHeaderLogoComponent();
+        // Left: Logo Image with Hospital Name
+        JPanel logoArea = new JPanel();
+        logoArea.setLayout(new BoxLayout(logoArea, BoxLayout.X_AXIS));
+        logoArea.setBackground(COLOR_NAVY);
+        logoArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
         
-        // Center: Current module name
-        currentModuleLabel = new JLabel("Dashboard");
-        currentModuleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));  // [UI CHANGE] Updated to 12pt
-        currentModuleLabel.setForeground(new Color(255, 255, 255, 200));  // [UI CHANGE] More transparent white
-        
-        // Right side: Date and Time
-        dateTimeLabel = new JLabel();
-        dateTimeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));  // [UI CHANGE] Updated to 11pt
-        dateTimeLabel.setForeground(new Color(255, 255, 255, 200));  // [UI CHANGE] More transparent white
-        
-        topPanel.add(logoComponent, BorderLayout.WEST);
-        topPanel.add(currentModuleLabel, BorderLayout.CENTER);
-        topPanel.add(dateTimeLabel, BorderLayout.EAST);
-        
-        return topPanel;
-    }
-    
-    /**
-     * Create header logo component - displays logo image or fallback text
-     */
-    private JComponent createHeaderLogoComponent() {
-        // Try to load rbh.webp logo image
+        // Load and add logo image (40x40)
+        JLabel logoImg = new JLabel();
         try {
-            File logoFile = new File("rbh.webp");
+            File logoFile = new File("download.png");
             if (logoFile.exists()) {
-                BufferedImage logoImage = ImageIO.read(logoFile);
-                if (logoImage != null) {
-                    // Scale logo to fit header (height 50px, maintain aspect ratio)
-                    int maxHeight = 45;
-                    int scaledWidth = (int) (logoImage.getWidth() * (maxHeight / (double) logoImage.getHeight()));
-                    Image scaledImage = logoImage.getScaledInstance(scaledWidth, maxHeight, Image.SCALE_SMOOTH);
-                    
-                    JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
-                    logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                    System.out.println("✓ Successfully loaded rbh.webp logo in header");
-                    return logoLabel;
-                }
+                BufferedImage logoBuffer = ImageIO.read(logoFile);
+                Image scaledImg = logoBuffer.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                logoImg.setIcon(new ImageIcon(scaledImg));
             }
         } catch (Exception e) {
-            System.out.println("Note: Could not load rbh.webp logo - using fallback text. (" + e.getMessage() + ")");
+            // Logo not found, continue without it
         }
+        logoArea.add(logoImg);
+        logoArea.add(Box.createHorizontalStrut(10));
         
-        // Fallback: Display "Birla CK Hospital" text
-        JLabel hospitalName = new JLabel("Birla CK Hospital");
-        hospitalName.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        hospitalName.setForeground(WHITE);
-        return hospitalName;
-    }
-    
-    /**
-     * Create the left sidebar with navigation buttons
-     */
-    private JPanel createSidebar() {
-        // [UI CHANGE] Sidebar styling for hospital website aesthetic
-        JPanel sidebar = new JPanel();
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(0x002D66));  // [UI CHANGE] Professional dark navy (kept for contrast)
-        sidebar.setPreferredSize(new Dimension(220, 0));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        // Add text labels stacked vertically
+        JPanel logoText = new JPanel();
+        logoText.setLayout(new BoxLayout(logoText, BoxLayout.Y_AXIS));
+        logoText.setBackground(COLOR_NAVY);
         
-        // [UI CHANGE] Logo/Brand area - Load rbh.webp image or display styled CK Birla logo
-        JPanel logoPanel = createLogoBrandPanel();
-        sidebar.add(logoPanel);
+        JLabel logoTitle = new JLabel("CK Birla Hospitals");
+        logoTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        logoTitle.setForeground(Color.WHITE);
         
-        // [UI CHANGE] Removed redundant "Management System" text - logo already displays hospital branding
+        JLabel logoSub = new JLabel("RUKMANI BIRLA HOSPITAL");
+        logoSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        logoSub.setForeground(new Color(180, 190, 210));
         
-        sidebar.add(Box.createVerticalStrut(40));
+        logoText.add(logoTitle);
+        logoText.add(logoSub);
+        logoArea.add(logoText);
         
-        // Navigation buttons
-        dashboardBtn = createNavButton("📊 Dashboard", true);
-        addPatientBtn = createNavButton("➕ Add Patient", false);
-        appointmentBtn = createNavButton("📅 Appointments", false);
+        navBar.add(logoArea, BorderLayout.WEST);
         
+        // Center: Navigation Links
+        JPanel navLinksPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        navLinksPanel.setOpaque(false);
+        
+        // Dashboard
+        dashboardBtn = createNavLink("Dashboard");
         dashboardBtn.addActionListener(e -> switchPanel("dashboard"));
+        navLinksPanel.add(dashboardBtn);
+        
+        // Add Patient
+        addPatientBtn = createNavLink("Add Patient");
         addPatientBtn.addActionListener(e -> switchPanel("addPatient"));
+        navLinksPanel.add(addPatientBtn);
+        
+        // Appointments
+        appointmentBtn = createNavLink("Appointments");
         appointmentBtn.addActionListener(e -> switchPanel("appointment"));
+        navLinksPanel.add(appointmentBtn);
         
-        sidebar.add(dashboardBtn);
-        sidebar.add(Box.createVerticalStrut(10));
-        sidebar.add(addPatientBtn);
-        sidebar.add(Box.createVerticalStrut(10));
-        sidebar.add(appointmentBtn);
-        
-        // Doctors button
-        doctorBtn = createNavButton("👨‍⚕️ Doctors", false);
+        // Doctors
+        doctorBtn = createNavLink("Doctors");
         doctorBtn.addActionListener(e -> switchPanel("doctor"));
+        navLinksPanel.add(doctorBtn);
         
-        billingBtn = createNavButton("💰 Billing", false);
+        // Billing
+        billingBtn = createNavLink("Billing");
         billingBtn.addActionListener(e -> switchPanel("billing"));
+        navLinksPanel.add(billingBtn);
         
-        reportsBtn = createNavButton("📈 Reports", false);
+        // Reports
+        reportsBtn = createNavLink("Reports");
         reportsBtn.addActionListener(e -> switchPanel("reports"));
+        navLinksPanel.add(reportsBtn);
         
-        sidebar.add(Box.createVerticalStrut(20));
-        sidebar.add(doctorBtn);
-        sidebar.add(Box.createVerticalStrut(10));
-        sidebar.add(billingBtn);
-        sidebar.add(Box.createVerticalStrut(10));
-        sidebar.add(reportsBtn);
+        navBar.add(navLinksPanel, BorderLayout.CENTER);
         
-        sidebar.add(Box.createVerticalGlue());
+        // Right: Status Badge and Actions
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        rightPanel.setOpaque(false);
         
-        // Exit button
-        JButton exitBtn = createNavButton("🚪 Exit", false);
-        exitBtn.setBackground(new Color(0xB71C1C));  // [UI CHANGE] Updated to darker red for exit button
-        exitBtn.addActionListener(e -> System.exit(0));
-        sidebar.add(exitBtn);
+        JLabel statusBadge = new JLabel("● Active");
+        statusBadge.setForeground(COLOR_SUCCESS);
+        statusBadge.setFont(FONT_SMALL);
+        rightPanel.add(statusBadge);
         
-        return sidebar;
+        rightPanel.add(Box.createHorizontalStrut(8));
+        
+        JButton logoutBtn = new JButton("⏻");
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        logoutBtn.setContentAreaFilled(false);
+        logoutBtn.setBorderPainted(false);
+        logoutBtn.setFocusPainted(false);
+        logoutBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutBtn.addActionListener(e -> System.exit(0));
+        rightPanel.add(logoutBtn);
+        
+        navBar.add(rightPanel, BorderLayout.EAST);
+        
+        return navBar;
     }
     
     /**
-     * [UI CHANGE] Create a custom logo panel that displays CK Birla Hospitals branding
-     * Tries to load rbh.webp, falls back to styled text representation
+     * Create a navigation link button (unstyled initially, styled on nav change)
      */
-    private JPanel createLogoBrandPanel() {
-        JPanel logoPanel = new JPanel() {
-            private BufferedImage logoImage = null;
-            
-            {
-                // Try to load the logo image once
-                try {
-                    File logoFile = new File("rbh.webp");
-                    if (logoFile.exists()) {
-                        logoImage = ImageIO.read(logoFile);
-                        if (logoImage != null) {
-                            System.out.println("✓ Successfully loaded rbh.webp logo");
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Note: Could not load rbh.webp - using styled text logo. (" + e.getMessage() + ")");
-                }
-            }
-            
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                
-                // If logo image loaded successfully, draw it
-                if (logoImage != null) {
-                    int width = getWidth();
-                    int height = getHeight();
-                    
-                    // Calculate scaling to fit within panel
-                    float scaleW = (float) width / logoImage.getWidth();
-                    float scaleH = (float) height / logoImage.getHeight();
-                    float scale = Math.min(scaleW, scaleH) * 0.9f;
-                    
-                    int imgWidth = (int) (logoImage.getWidth() * scale);
-                    int imgHeight = (int) (logoImage.getHeight() * scale);
-                    int x = (width - imgWidth) / 2;
-                    int y = (height - imgHeight) / 2;
-                    
-                    g2.drawImage(logoImage, x, y, imgWidth, imgHeight, this);
-                } else {
-                    // [UI CHANGE] Fallback: Draw styled CK Birla logo text
-                    int width = getWidth();
-                    int height = getHeight();
-                    
-                    // "CK" in red
-                    g2.setColor(PRIMARY_RED);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 22));
-                    g2.drawString("CK", 20, 35);
-                    
-                    // "Birla Hospitals" in dark gray
-                    g2.setColor(DARK_GRAY);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
-                    g2.drawString("Birla", 65, 32);
-                    
-                    g2.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-                    g2.drawString("Hospitals", 65, 46);
-                    
-                    // [UI CHANGE] Only show hospital name, removed "Management System" - redundant
-                    // "RUKMANI BIRLA HOSPITAL" subtitle in gray
-                    g2.setColor(new Color(0x999999));
-                    g2.setFont(new Font("Segoe UI", Font.PLAIN, 9));
-                    g2.drawString("RUKMANI BIRLA HOSPITAL", 20, 65);
-                }
-            }
-        };
-        
-        logoPanel.setPreferredSize(new Dimension(220, 80));
-        logoPanel.setMaximumSize(new Dimension(220, 80));
-        logoPanel.setOpaque(false);
-        logoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        return logoPanel;
-    }
-    
-    /**
-     * Create a styled navigation button
-     */
-    private JButton createNavButton(String text, boolean isActive) {
-        // [UI CHANGE] Updated button styling for hospital website aesthetic
+    private JButton createNavLink(String text) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        btn.setFocusPainted(false);
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setMaximumSize(new Dimension(200, 40));
-        btn.setMinimumSize(new Dimension(200, 40));
-        btn.setPreferredSize(new Dimension(200, 40));
-        
-        if (isActive) {
-            btn.setBackground(PRIMARY_RED);  // [UI CHANGE] Active button = Primary Red
-            btn.setForeground(WHITE);
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        } else {
-            btn.setBackground(STEEL_GRAY);  // [UI CHANGE] Inactive button = Steel Gray
-            btn.setForeground(WHITE);
-        }
-        
-        btn.setOpaque(true);
+        btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
-        btn.setBorder(null);
+        btn.setFocusPainted(false);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(FONT_BODY);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // [UI CHANGE] Add hover effect
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(isActive ? HOVER_RED : new Color(0x546E7A));
+                btn.setForeground(new Color(255, 200, 200));  // Light red on hover
             }
             
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(isActive ? PRIMARY_RED : STEEL_GRAY);
+                btn.setForeground(Color.WHITE);
             }
         });
         
@@ -349,17 +240,398 @@ public class MainDashboard extends JFrame {
     }
     
     /**
+     * Create the main content area (stacked vertically)
+     */
+    private JPanel createMainContent() {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(COLOR_BG_PAGE);
+        
+        // Hero Panel (Dashboard only)
+        JPanel heroPanel = createHeroPanel();
+        mainPanel.add(heroPanel);
+        
+        // Metrics Strip (Dashboard only)
+        JPanel metricsStrip = createMetricsStrip();
+        mainPanel.add(metricsStrip);
+        
+        // Action Cards Section (Dashboard only)
+        JPanel actionSection = createActionSection();
+        mainPanel.add(actionSection);
+        
+        // Content Area with CardLayout (always visible)
+        cardPanel = createCardPanel();
+        mainPanel.add(cardPanel);
+        
+        return mainPanel;
+    }
+    
+    /**
+     * Create hero panel for dashboard welcome section with hospital image
+     */
+    private JPanel createHeroPanel() {
+        JPanel hero = new JPanel(new BorderLayout());
+        hero.setBackground(COLOR_BG_PAGE);
+        hero.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        hero.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
+        
+        // Left content
+        JPanel leftContent = new JPanel();
+        leftContent.setLayout(new BoxLayout(leftContent, BoxLayout.Y_AXIS));
+        leftContent.setOpaque(false);
+        
+        JLabel pretitle = new JLabel("Birla Hospital System");
+        pretitle.setFont(FONT_SMALL);
+        pretitle.setForeground(COLOR_PRIMARY);
+        pretitle.setText(pretitle.getText().toUpperCase());
+        leftContent.add(pretitle);
+        
+        JLabel welcomeTitle = new JLabel("Welcome to Birla Hospital");
+        welcomeTitle.setFont(FONT_TITLE);
+        welcomeTitle.setForeground(COLOR_NAVY);
+        leftContent.add(Box.createVerticalStrut(8));
+        leftContent.add(welcomeTitle);
+        
+        JLabel subtitle = new JLabel("<html>Manage patients, appointments, doctors, billing and reports from one place.</html>");
+        subtitle.setFont(FONT_BODY);
+        subtitle.setForeground(COLOR_TEXT_BODY);
+        leftContent.add(Box.createVerticalStrut(12));
+        leftContent.add(subtitle);
+        
+        leftContent.add(Box.createVerticalStrut(16));
+        
+        // Buttons panel (no logo here)
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        buttonPanel.setOpaque(false);
+        
+        JButton getStartedBtn = createPrimaryButton("Get Started");
+        getStartedBtn.addActionListener(e -> switchPanel("addPatient"));
+        buttonPanel.add(getStartedBtn);
+        
+        JButton viewReportsBtn = new JButton("View Reports");
+        viewReportsBtn.setFont(FONT_SUBHEAD);
+        viewReportsBtn.setForeground(COLOR_PRIMARY);
+        viewReportsBtn.setBackground(COLOR_BG_PAGE);
+        viewReportsBtn.setOpaque(true);
+        viewReportsBtn.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARY, 2));
+        viewReportsBtn.setFocusPainted(false);
+        viewReportsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        viewReportsBtn.addActionListener(e -> switchPanel("reports"));
+        buttonPanel.add(viewReportsBtn);
+        
+        leftContent.add(buttonPanel);
+        
+        hero.add(leftContent, BorderLayout.WEST);
+        
+        // Right content - Hospital Image or Medical Graphic
+        JPanel rightContent = new JPanel() {
+            private BufferedImage hospitalImage = null;
+            
+            {
+                // Try to load hospital image
+                try {
+                    File imageFile = new File("download.jpeg");
+                    if (imageFile.exists()) {
+                        hospitalImage = ImageIO.read(imageFile);
+                        System.out.println("✓ Hospital image loaded successfully");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Note: Could not load hospital image - using medical graphic instead");
+                }
+            }
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                if (hospitalImage != null) {
+                    // Draw hospital image scaled to fit
+                    int maxWidth = getWidth() - 20;
+                    int maxHeight = getHeight() - 20;
+                    float scaleW = (float) maxWidth / hospitalImage.getWidth();
+                    float scaleH = (float) maxHeight / hospitalImage.getHeight();
+                    float scale = Math.min(scaleW, scaleH);
+                    
+                    int imgWidth = (int) (hospitalImage.getWidth() * scale);
+                    int imgHeight = (int) (hospitalImage.getHeight() * scale);
+                    int x = (getWidth() - imgWidth) / 2;
+                    int y = (getHeight() - imgHeight) / 2;
+                    
+                    g2.drawImage(hospitalImage, x, y, imgWidth, imgHeight, this);
+                } else {
+                    // Fallback: Draw medical cross symbol
+                    g2.setColor(new Color(192, 39, 45, 50));
+                    g2.setStroke(new BasicStroke(6));
+                    int size = 60;
+                    int x = (getWidth() - size) / 2;
+                    int y = (getHeight() - size) / 2;
+                    g2.drawLine(x + size / 2, y, x + size / 2, y + size);
+                    g2.drawLine(x, y + size / 2, x + size, y + size / 2);
+                }
+            }
+        };
+        rightContent.setOpaque(false);
+        hero.add(rightContent, BorderLayout.CENTER);
+        
+        return hero;
+    }
+    
+    /**
+     * Create metrics strip with stat cards
+     */
+    private JPanel createMetricsStrip() {
+        JPanel strip = new JPanel(new GridLayout(1, 3, 16, 0));
+        strip.setBackground(COLOR_BG_PAGE);
+        strip.setBorder(BorderFactory.createEmptyBorder(0, 40, 24, 40));
+        strip.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        
+        int totalPatients = patientDAO.getTotalPatients();
+        int totalAppointments = appointmentDAO.getTotalAppointments();
+        
+        // Total Patients Card
+        JPanel patientCard = createCard();
+        patientCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(3, 0, 0, 0, COLOR_PRIMARY),
+            BorderFactory.createEmptyBorder(24, 24, 24, 24)
+        ));
+        JLabel patientIcon = new JLabel("👥");
+        patientIcon.setFont(new Font("Segoe UI", Font.PLAIN, 32));
+        JLabel patientValue = new JLabel(String.valueOf(totalPatients));
+        patientValue.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        patientValue.setForeground(COLOR_PRIMARY);
+        JLabel patientLabel = new JLabel("Total Patients");
+        patientLabel.setFont(FONT_SMALL);
+        patientLabel.setForeground(COLOR_TEXT_MUTED);
+        patientCard.setLayout(new BoxLayout(patientCard, BoxLayout.Y_AXIS));
+        patientCard.add(patientIcon);
+        patientCard.add(Box.createVerticalStrut(8));
+        patientCard.add(patientValue);
+        patientCard.add(Box.createVerticalStrut(4));
+        patientCard.add(patientLabel);
+        strip.add(patientCard);
+        
+        // Scheduled Appointments Card
+        JPanel appointmentCard = createCard();
+        appointmentCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(3, 0, 0, 0, COLOR_PRIMARY),
+            BorderFactory.createEmptyBorder(24, 24, 24, 24)
+        ));
+        JLabel appointmentIcon = new JLabel("📅");
+        appointmentIcon.setFont(new Font("Segoe UI", Font.PLAIN, 32));
+        JLabel appointmentValue = new JLabel(String.valueOf(totalAppointments));
+        appointmentValue.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        appointmentValue.setForeground(COLOR_PRIMARY);
+        JLabel appointmentLabel = new JLabel("Scheduled Appointments");
+        appointmentLabel.setFont(FONT_SMALL);
+        appointmentLabel.setForeground(COLOR_TEXT_MUTED);
+        appointmentCard.setLayout(new BoxLayout(appointmentCard, BoxLayout.Y_AXIS));
+        appointmentCard.add(appointmentIcon);
+        appointmentCard.add(Box.createVerticalStrut(8));
+        appointmentCard.add(appointmentValue);
+        appointmentCard.add(Box.createVerticalStrut(4));
+        appointmentCard.add(appointmentLabel);
+        strip.add(appointmentCard);
+        
+        // System Status Card
+        JPanel statusCard = createCard();
+        statusCard.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(3, 0, 0, 0, COLOR_SUCCESS),
+            BorderFactory.createEmptyBorder(24, 24, 24, 24)
+        ));
+        JLabel statusIcon = new JLabel("✅");
+        statusIcon.setFont(new Font("Segoe UI", Font.PLAIN, 32));
+        JLabel statusValue = new JLabel("Active");
+        statusValue.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        statusValue.setForeground(COLOR_SUCCESS);
+        JLabel statusLabel = new JLabel("System Status");
+        statusLabel.setFont(FONT_SMALL);
+        statusLabel.setForeground(COLOR_TEXT_MUTED);
+        statusCard.setLayout(new BoxLayout(statusCard, BoxLayout.Y_AXIS));
+        statusCard.add(statusIcon);
+        statusCard.add(Box.createVerticalStrut(8));
+        statusCard.add(statusValue);
+        statusCard.add(Box.createVerticalStrut(4));
+        statusCard.add(statusLabel);
+        strip.add(statusCard);
+        
+        return strip;
+    }
+    
+    /**
+     * Create action cards section - all cards fully clickable
+     */
+    private JPanel createActionSection() {
+        JPanel section = new JPanel(new GridLayout(1, 3, 16, 0));
+        section.setBackground(COLOR_BG_PAGE);
+        section.setBorder(BorderFactory.createEmptyBorder(0, 40, 40, 40));
+        section.setMaximumSize(new Dimension(Integer.MAX_VALUE, 160));
+        
+        // Card 1: Find a Doctor (Red) - Fully clickable
+        section.add(createActionCard(COLOR_PRIMARY, "Find a Doctor", "Browse by name or specialty", "→", () -> switchPanel("doctor")));
+        
+        // Card 2: Health Check-up (Light Gray) - Fully clickable
+        section.add(createActionCard(new Color(241, 243, 246), "Health Check-up", "Schedule your check-up today", "", () -> switchPanel("appointment")));
+        
+        // Card 3: Book Appointment (Slate) - Fully clickable
+        section.add(createActionCard(new Color(220, 228, 240), "Book Appointment", "Get expert care whenever you need", "", () -> switchPanel("appointment")));
+        
+        return section;
+    }
+    
+    /**
+     * Helper method to create a clickable action card
+     */
+    private JPanel createActionCard(Color bgColor, String title, String subtitle, String arrow, Runnable onClicked) {
+        // Create a custom JPanel that properly captures mouse events
+        JPanel card = new JPanel() {
+            private boolean isHovered = false;
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Draw slight hover effect
+                if (isHovered) {
+                    g2.setColor(new Color(0, 0, 0, 10));
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+        
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(bgColor);
+        card.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
+        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Add mouse listener for hover and click effects
+        card.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                onClicked.run();
+            }
+            
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                card.setOpaque(false);
+                card.repaint();
+            }
+            
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                card.setOpaque(true);
+                card.repaint();
+            }
+        });
+        
+        // Title
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(FONT_HEADING);
+        Color titleColor = bgColor.equals(COLOR_PRIMARY) ? Color.WHITE : COLOR_NAVY;
+        titleLabel.setForeground(titleColor);
+        card.add(titleLabel);
+        
+        card.add(Box.createVerticalStrut(4));
+        
+        // Subtitle
+        JLabel subtitleLabel = new JLabel(subtitle);
+        subtitleLabel.setFont(FONT_SMALL);
+        Color subtitleColor = bgColor.equals(COLOR_PRIMARY) ? new Color(255, 200, 200) : COLOR_TEXT_MUTED;
+        subtitleLabel.setForeground(subtitleColor);
+        card.add(subtitleLabel);
+        
+        card.add(Box.createVerticalGlue());
+        
+        // Arrow (if provided)
+        if (!arrow.isEmpty()) {
+            JLabel arrowLabel = new JLabel(arrow);
+            arrowLabel.setFont(new Font("Segoe UI", Font.PLAIN, 24));
+            arrowLabel.setForeground(Color.WHITE);
+            card.add(arrowLabel);
+        }
+        
+        return card;
+    }
+    
+    /**
+     * Create the footer bar
+     */
+    private JPanel createFooter() {
+        JPanel footer = new JPanel(new BorderLayout());
+        footer.setBackground(COLOR_NAVY);
+        footer.setPreferredSize(new Dimension(0, 48));
+        footer.setBorder(BorderFactory.createEmptyBorder(0, 24, 0, 24));
+        
+        JLabel leftLabel = new JLabel("CK Birla Hospitals");
+        leftLabel.setFont(FONT_SMALL);
+        leftLabel.setForeground(Color.WHITE);
+        footer.add(leftLabel, BorderLayout.WEST);
+        
+        JLabel centerLabel = new JLabel("© 2026 Rukmani Birla Hospital");
+        centerLabel.setFont(FONT_SMALL);
+        centerLabel.setForeground(Color.WHITE);
+        footer.add(centerLabel, BorderLayout.CENTER);
+        
+        JLabel rightLabel = new JLabel("Emergency: 07340054470");
+        rightLabel.setFont(FONT_SMALL);
+        rightLabel.setForeground(COLOR_PRIMARY);
+        footer.add(rightLabel, BorderLayout.EAST);
+        
+        return footer;
+    }
+    
+    /**
+     * Helper method: Create a card panel with standard styling
+     */
+    private JPanel createCard() {
+        JPanel card = new JPanel();
+        card.setBackground(COLOR_BG_CARD);
+        card.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
+        return card;
+    }
+    
+    /**
+     * Helper method: Create a primary action button
+     */
+    private JButton createPrimaryButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(COLOR_PRIMARY);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(FONT_SUBHEAD);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setOpaque(true);
+        
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                btn.setBackground(COLOR_PRIMARY_DARK);
+            }
+            
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                btn.setBackground(COLOR_PRIMARY);
+            }
+        });
+        
+        return btn;
+    }
+/**
      * Create the card panel for switching between different views
      */
     private JPanel createCardPanel() {
         cardPanel = new JPanel();
         cardLayout = new CardLayout();
         cardPanel.setLayout(cardLayout);
-        cardPanel.setBackground(new Color(0xF5F5F5));  // [UI CHANGE] Updated to LIGHT_GRAY (#F5F5F5) for hospital website look
+        cardPanel.setBackground(COLOR_BG_PAGE);
+        cardPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         
-        // Add panels
-        dashboardPanel = createDashboardPanel();
-        cardPanel.add(dashboardPanel, "dashboard");
+        // Add panels with updated styling
+        cardPanel.add(createDashboardPanel(), "dashboard");
         cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
         cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
         cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
@@ -370,62 +642,42 @@ public class MainDashboard extends JFrame {
     }
     
     /**
-     * Create the dashboard panel
+     * Create the dashboard panel - statistics and welcome content
      */
     private JPanel createDashboardPanel() {
-        // [UI CHANGE] Updated dashboard styling for hospital website aesthetic
         JPanel dashboard = new JPanel();
         dashboard.setLayout(new BoxLayout(dashboard, BoxLayout.Y_AXIS));
-        dashboard.setBackground(new Color(0xF5F5F5));  // [UI CHANGE] Light gray background
-        dashboard.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        dashboard.setBackground(COLOR_BG_PAGE);
+        dashboard.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         
-        // Welcome message
-        JLabel welcomeLabel = new JLabel("Welcome to Birla Hospital");  // [UI CHANGE] Updated to "Welcome to Birla Hospital"
-        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        welcomeLabel.setForeground(DARK_GRAY);  // [UI CHANGE] Changed to DARK_GRAY (#4A4A4A)
-        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel welcomeLabel = new JLabel("Hospital Management Overview");
+        welcomeLabel.setFont(FONT_HEADING);
+        welcomeLabel.setForeground(COLOR_NAVY);
         dashboard.add(welcomeLabel);
         
-        dashboard.add(Box.createVerticalStrut(20));
+        dashboard.add(Box.createVerticalStrut(24));
         
-        // Statistics panel
-        JPanel statsPanel = new JPanel();
-        statsPanel.setLayout(new GridLayout(1, 3, 20, 0));
-        statsPanel.setBackground(new Color(0xF5F5F5));  // [UI CHANGE] Updated background
-        statsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        int totalPatients = patientDAO.getTotalPatients();
-        int totalAppointments = appointmentDAO.getTotalAppointments();
-        
-        // [UI CHANGE] Updated stat card colors to match hospital website
-        statsPanel.add(createStatCard("Total Patients", String.valueOf(totalPatients), PRIMARY_RED));
-        statsPanel.add(createStatCard("Scheduled Appointments", String.valueOf(totalAppointments), PRIMARY_RED));
-        statsPanel.add(createStatCard("System Status", "Active", STEEL_GRAY));
-        
-        dashboard.add(statsPanel);
-        
-        dashboard.add(Box.createVerticalStrut(40));
-        
-        // Quick info
-        JLabel infoLabel = new JLabel("Use the sidebar to navigate through different modules:");
-        infoLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));  // [UI CHANGE] Made bold
-        infoLabel.setForeground(DARK_GRAY);  // [UI CHANGE] Changed to DARK_GRAY
-        infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel infoLabel = new JLabel("Quick information about the system:");
+        infoLabel.setFont(FONT_BODY);
+        infoLabel.setForeground(COLOR_TEXT_BODY);
         dashboard.add(infoLabel);
         
-        dashboard.add(Box.createVerticalStrut(15));
+        dashboard.add(Box.createVerticalStrut(16));
         
         JTextArea infoArea = new JTextArea();
         infoArea.setText("• Add Patient: Register new patients to the system\n\n" +
                         "• Appointments: Book and manage patient appointments\n\n" +
                         "• View Patient Records: Access detailed patient information\n\n" +
-                        "• Track Appointments: Monitor appointment status and tokens");
-        infoArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                        "• Track Appointments: Monitor appointment status and tokens\n\n" +
+                        "• Doctors: Manage doctor information and specialties\n\n" +
+                        "• Billing: Process patient bills and payments\n\n" +
+                        "• Reports: View analytics and system reports");
+        infoArea.setFont(FONT_BODY);
         infoArea.setEditable(false);
         infoArea.setOpaque(false);
         infoArea.setLineWrap(true);
         infoArea.setWrapStyleWord(true);
-        infoArea.setForeground(new Color(80, 80, 80));
+        infoArea.setForeground(COLOR_TEXT_BODY);
         dashboard.add(infoArea);
         
         dashboard.add(Box.createVerticalGlue());
@@ -434,115 +686,73 @@ public class MainDashboard extends JFrame {
     }
     
     /**
-     * Create a statistic card
-     */
-    private JPanel createStatCard(String title, String value, Color color) {
-        // [UI CHANGE] Redesigned stat card with hospital website styling
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(WHITE);  // [UI CHANGE] White background
-        
-        // [UI CHANGE] Updated border styling - thinner top border in card color, light bottom shadow
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(3, 0, 0, 0, color),  // [UI CHANGE] Top border only
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));  // [UI CHANGE] 11pt from 12pt
-        titleLabel.setForeground(STEEL_GRAY);  // [UI CHANGE] Steel gray for labels
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));  // [UI CHANGE] Increased to 36pt for better emphasis
-        valueLabel.setForeground(color);  // [UI CHANGE] Color parameter maintained
-        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        card.add(titleLabel);
-        card.add(Box.createVerticalStrut(8));  // [UI CHANGE] Reduced spacing
-        card.add(valueLabel);
-        
-        return card;
-    }
-    
-    /**
      * Refresh dashboard statistics with latest data from database
      */
     private void refreshDashboard() {
         // Recreate the dashboard panel with updated statistics
-        cardPanel.remove(dashboardPanel);
-        dashboardPanel = createDashboardPanel();
-        cardPanel.add(dashboardPanel, "dashboard");
-        cardLayout.show(cardPanel, "dashboard");  // Ensure dashboard is displayed after refresh
+        cardPanel.removeAll();
+        cardPanel.add(createDashboardPanel(), "dashboard");
+        cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
+        cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
+        cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
+        cardPanel.add(new BillingPanel(billDAO, patientDAO), "billing");
+        cardPanel.add(new ReportPanel(), "reports");
+        cardLayout.show(cardPanel, "dashboard");
     }
     
     /**
-     * Switch to a different panel
+     * Switch to a different panel and update navbar highlighting
      */
     private void switchPanel(String panelName) {
         cardLayout.show(cardPanel, panelName);
         
-        // [UI CHANGE] Updated button color switching with hospital website colors
-        dashboardBtn.setBackground(panelName.equals("dashboard") ? PRIMARY_RED : STEEL_GRAY);
-        dashboardBtn.setFont(new Font("Segoe UI", panelName.equals("dashboard") ? Font.BOLD : Font.PLAIN, 12));
+        // Update nav button styling based on active panel
+        resetNavButtonStyles();
         
-        addPatientBtn.setBackground(panelName.equals("addPatient") ? PRIMARY_RED : STEEL_GRAY);
-        addPatientBtn.setFont(new Font("Segoe UI", panelName.equals("addPatient") ? Font.BOLD : Font.PLAIN, 12));
-        
-        appointmentBtn.setBackground(panelName.equals("appointment") ? PRIMARY_RED : STEEL_GRAY);
-        appointmentBtn.setFont(new Font("Segoe UI", panelName.equals("appointment") ? Font.BOLD : Font.PLAIN, 12));
-        
-        doctorBtn.setBackground(panelName.equals("doctor") ? PRIMARY_RED : STEEL_GRAY);
-        doctorBtn.setFont(new Font("Segoe UI", panelName.equals("doctor") ? Font.BOLD : Font.PLAIN, 12));
-        
-        if (billingBtn != null) {
-            billingBtn.setBackground(panelName.equals("billing") ? RED_ACCENT : LIGHT_BLUE);
-            billingBtn.setFont(new Font("Segoe UI", panelName.equals("billing") ? Font.BOLD : Font.PLAIN, 12));
-        }
-        
-        if (reportsBtn != null) {
-            reportsBtn.setBackground(panelName.equals("reports") ? PRIMARY_RED : STEEL_GRAY);
-            reportsBtn.setFont(new Font("Segoe UI", panelName.equals("reports") ? Font.BOLD : Font.PLAIN, 12));
-        }
-        
-        // Update module label and refresh if switching to dashboard
         switch (panelName) {
             case "dashboard":
-                currentModuleLabel.setText("Dashboard");
-                // Refresh dashboard statistics when returning to dashboard
+                dashboardBtn.setForeground(COLOR_PRIMARY);
+                dashboardBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 refreshDashboard();
                 break;
             case "addPatient":
-                currentModuleLabel.setText("Add Patient");
+                addPatientBtn.setForeground(COLOR_PRIMARY);
+                addPatientBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 break;
             case "appointment":
-                currentModuleLabel.setText("Appointments");
+                appointmentBtn.setForeground(COLOR_PRIMARY);
+                appointmentBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 break;
             case "doctor":
-                currentModuleLabel.setText("Doctors");
+                doctorBtn.setForeground(COLOR_PRIMARY);
+                doctorBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 break;
             case "billing":
-                currentModuleLabel.setText("Billing");
+                billingBtn.setForeground(COLOR_PRIMARY);
+                billingBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 break;
             case "reports":
-                currentModuleLabel.setText("Reports & Analytics");
+                reportsBtn.setForeground(COLOR_PRIMARY);
+                reportsBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 break;
         }
     }
     
     /**
-     * Start background thread to update date/time
+     * Reset all nav buttons to default styling
      */
-    private void startDateTimeUpdater() {
-        Timer timer = new Timer(1000, e -> updateDateTime());
-        timer.start();
-    }
-    
-    /**
-     * Update the date/time display
-     */
-    private void updateDateTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM dd, yyyy | HH:mm:ss");
-        dateTimeLabel.setText(dateFormat.format(new Date()));
+    private void resetNavButtonStyles() {
+        dashboardBtn.setForeground(Color.WHITE);
+        dashboardBtn.setFont(FONT_BODY);
+        addPatientBtn.setForeground(Color.WHITE);
+        addPatientBtn.setFont(FONT_BODY);
+        appointmentBtn.setForeground(Color.WHITE);
+        appointmentBtn.setFont(FONT_BODY);
+        doctorBtn.setForeground(Color.WHITE);
+        doctorBtn.setFont(FONT_BODY);
+        billingBtn.setForeground(Color.WHITE);
+        billingBtn.setFont(FONT_BODY);
+        reportsBtn.setForeground(Color.WHITE);
+        reportsBtn.setFont(FONT_BODY);
     }
 }

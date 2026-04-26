@@ -18,11 +18,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class ReportPanel extends JPanel {
-    private Color PRIMARY_COLOR = Color.decode("#003566");
-    private Color SECONDARY_COLOR = Color.decode("#1E508C");
-    private Color ACCENT_COLOR = Color.decode("#D62828");
-    private Color BACKGROUND_COLOR = Color.decode("#F0F0F0");
-    private Color ROW_COLOR = Color.decode("#EAF0FB");
+    // Modern CK Birla Color Palette (matches MainDashboard)
+    private Color PRIMARY_COLOR = new Color(192, 39, 45);        // CK Birla red
+    private Color SECONDARY_COLOR = new Color(27, 58, 107);      // Navy headings
+    private Color ACCENT_COLOR = new Color(192, 39, 45);         // Primary red
+    private Color BACKGROUND_COLOR = new Color(247, 248, 250);   // page background
+    private Color ROW_COLOR = new Color(241, 243, 246);          // light gray
+    
+    // Backward compatibility aliases
+    private Color DARK_BLUE = PRIMARY_COLOR;
+    private Color LIGHT_GRAY = BACKGROUND_COLOR;
+    private Color RED_ACCENT = PRIMARY_COLOR;
+    private Color WHITE = Color.WHITE;
 
     private JSpinner fromDateSpinner;
     private JSpinner toDateSpinner;
