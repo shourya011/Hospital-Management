@@ -630,13 +630,13 @@ public class MainDashboard extends JFrame {
         cardPanel.setBackground(COLOR_BG_PAGE);
         cardPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         
-        // Add panels with updated styling
+        // Add only dashboard panel - other modules will open in separate windows
         cardPanel.add(createDashboardPanel(), "dashboard");
-        cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
-        cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
-        cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
-        cardPanel.add(new BillingPanel(billDAO, patientDAO), "billing");
-        cardPanel.add(new ReportPanel(), "reports");
+        cardPanel.add(new JPanel(), "addPatient");      // Placeholder
+        cardPanel.add(new JPanel(), "appointment");     // Placeholder
+        cardPanel.add(new JPanel(), "doctor");          // Placeholder
+        cardPanel.add(new JPanel(), "billing");         // Placeholder
+        cardPanel.add(new JPanel(), "reports");         // Placeholder
         
         return cardPanel;
     }
@@ -692,25 +692,25 @@ public class MainDashboard extends JFrame {
         // Recreate the dashboard panel with updated statistics
         cardPanel.removeAll();
         cardPanel.add(createDashboardPanel(), "dashboard");
-        cardPanel.add(new AddPatientPanel(patientDAO), "addPatient");
-        cardPanel.add(new AppointmentPanel(appointmentDAO, patientDAO), "appointment");
-        cardPanel.add(new AddDoctorPanel(doctorDAO), "doctor");
-        cardPanel.add(new BillingPanel(billDAO, patientDAO), "billing");
-        cardPanel.add(new ReportPanel(), "reports");
+        cardPanel.add(new JPanel(), "addPatient");      // Placeholder
+        cardPanel.add(new JPanel(), "appointment");     // Placeholder
+        cardPanel.add(new JPanel(), "doctor");          // Placeholder
+        cardPanel.add(new JPanel(), "billing");         // Placeholder
+        cardPanel.add(new JPanel(), "reports");         // Placeholder
         cardLayout.show(cardPanel, "dashboard");
     }
     
     /**
      * Switch to a different panel and update navbar highlighting
+     * For non-dashboard modules, opens a separate window
      */
     private void switchPanel(String panelName) {
-        cardLayout.show(cardPanel, panelName);
-        
         // Update nav button styling based on active panel
         resetNavButtonStyles();
         
         switch (panelName) {
             case "dashboard":
+                cardLayout.show(cardPanel, panelName);
                 dashboardBtn.setForeground(COLOR_PRIMARY);
                 dashboardBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
                 refreshDashboard();
@@ -718,22 +718,27 @@ public class MainDashboard extends JFrame {
             case "addPatient":
                 addPatientBtn.setForeground(COLOR_PRIMARY);
                 addPatientBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                new AddPatientFrame(patientDAO);
                 break;
             case "appointment":
                 appointmentBtn.setForeground(COLOR_PRIMARY);
                 appointmentBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                new AppointmentFrame(appointmentDAO, patientDAO);
                 break;
             case "doctor":
                 doctorBtn.setForeground(COLOR_PRIMARY);
                 doctorBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                new AddDoctorFrame(doctorDAO);
                 break;
             case "billing":
                 billingBtn.setForeground(COLOR_PRIMARY);
                 billingBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                new BillingFrame(billDAO, patientDAO);
                 break;
             case "reports":
                 reportsBtn.setForeground(COLOR_PRIMARY);
                 reportsBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                new ReportFrame();
                 break;
         }
     }
